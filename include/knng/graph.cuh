@@ -31,7 +31,7 @@ __DEVICE__ void Print(KNNGraph *knn_graph) {
   if (threadIdx.x == 0 && blockIdx.x == 0) {
     for (int i = 0; i < knn_graph->num; i++) {
       for (int j = 0; j < K; j++) {
-        printf("%d ", knn_graph->graph[i * K + j]);
+        printf("%u ", knn_graph->graph[i * K + j]);
       }
       printf("\n");
     }
@@ -73,8 +73,6 @@ __global__ void InitGraph(KNNGraph *knn_graph) {
 
     knn_graph->graph[tid * K + i] = n;
   }
-
-  Print(knn_graph);
 }
 
 __global__ void SwapGraph(KNNGraph *knn_graph) {
@@ -94,8 +92,6 @@ __DEVICE__ void Refine(KNNGraph *knn_graph) {
     return;
   }
 
-  Print(knn_graph);
-
   PriorityQueue queue;
   L2Distance distance(knn_graph->data, knn_graph->data + id * DIM);
 
@@ -103,21 +99,20 @@ __DEVICE__ void Refine(KNNGraph *knn_graph) {
     uint32_t n = knn_graph->graph[id * K + i];  // neighbor
     float dist = distance.Compare(n);
     queue.Add(n, dist);
-    // CheckCudaStatus();
 
     for (int j = 0; j < K; j++) {
       uint32_t nn = knn_graph->graph[n * K + j];  // neighbor's neighbor
-      dist = distance.Compare(nn);
-      queue.Add(nn, dist);
-      // CheckCudaStatus();
+      if (nn != id) {
+        dist = distance.Compare(nn);
+        queue.Add(nn, dist);
+        __syncthreads();
+      }
     }
   }
 
-  Print(knn_graph);
-
   __syncthreads();
   uint32_t k = threadIdx.x;
-  if (k < K) {
+  if (k >= K) {
     return;
   }
 

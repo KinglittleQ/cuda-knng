@@ -34,6 +34,8 @@ struct L2Distance {
   }
   
   __DEVICE__ float Compare(const uint32_t p) {
+    __shared__ float shared_sum;
+
     float result = 0;
     for (int i = 0; i < ITEMS_PER_THREAD; i++) {
       int tid = i * BLOCK_DIM_X + threadIdx.x;
@@ -43,7 +45,14 @@ struct L2Distance {
       }
     }
 
-    return BlockReduce(*storage).Sum(result);
+    float sum = BlockReduce(*storage).Sum(result);
+
+    if (threadIdx.x == 0) {
+      shared_sum = sum;
+    }
+    __syncthreads();
+
+    return shared_sum;
   }
 
 };

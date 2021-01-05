@@ -14,10 +14,20 @@
 #include <knng/graph.cuh>
 
 
+void Print(uint32_t *graph) {
+  for (int i = 0; i < 10; i++) {
+    for (int j = 0; j < K; j++) {
+      printf("%u ", graph[i * K + j]);
+    }
+    printf("\n");
+  }
+}
+
+
 struct NNDescent {
   const float *data;
   size_t num;
-  uint32_t *graph;
+  uint32_t *graph, *new_graph;
   KNNGraph *knn_graph;
 
   float *cuda_data;
@@ -25,6 +35,7 @@ struct NNDescent {
 
   NNDescent(const float *data, size_t num) : data(data), num(num) {
     graph = new uint32_t[K * num];
+    new_graph = new uint32_t[K * num];
     cudaMalloc(&cuda_data, num * DIM * sizeof(float));
     cudaMemcpy(cuda_data, data, num * DIM * sizeof(float), cudaMemcpyHostToDevice);
     cudaMalloc(&cuda_graph, K * num * sizeof(uint32_t));
@@ -37,6 +48,7 @@ struct NNDescent {
 
   ~NNDescent() {
     delete[] graph;
+    delete[] new_graph;
     cudaFree(cuda_data);
     cudaFree(cuda_graph);
     cudaFree(cuda_new_graph);
@@ -46,7 +58,6 @@ struct NNDescent {
   void Build(int num_iters) {
     printf("Init graph ...\n");
     int num_blocks = (num - 1) / BLOCK_DIM_X + 1;
-    // knn_graph->InitGraph<<<num_blocks, BLOCK_DIM_X>>>();
     InitGraph<<<num_blocks, BLOCK_DIM_X>>>(knn_graph);
 
     for (int i = 0; i < num_iters; i++) {
@@ -55,12 +66,13 @@ struct NNDescent {
       SwapGraph<<<num, K>>>(knn_graph);
       CheckCudaStatus();
     }
-
     cudaMemcpy(graph, cuda_graph, num * K * sizeof(uint32_t), cudaMemcpyDeviceToHost);
+    // Print(graph);
+
+
     CheckCudaStatus();
   }
 };
-
 
 
 #endif

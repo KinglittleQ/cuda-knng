@@ -15,5 +15,4 @@ do {                                                                        \
 } while (false)
 
 
-
 #endif

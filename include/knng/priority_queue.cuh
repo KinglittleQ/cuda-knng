@@ -55,12 +55,12 @@ struct PriorityQueue {
         ids[tid + 1] = entry_id;
         dists[tid + 1] = entry_dist;
       }
+
       if (tid == 0 || dists[tid - 1] <= dist) {
         ids[tid] = id;
         dists[tid] = dist;
       }
     }
-
   }
 
   __DEVICE__ uint32_t Top() {
