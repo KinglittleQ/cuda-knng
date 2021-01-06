@@ -1,5 +1,5 @@
-#ifndef ANNS_DATASET_SIFT_HPP_
-#define ANNS_DATASET_SIFT_HPP_
+#ifndef ANNS_SIFT_HPP_
+#define ANNS_SIFT_HPP_
 
 #include "dataset.hpp"
 

@@ -22,17 +22,20 @@ struct KNNGraph {
   uint32_t *graph;
   uint32_t *new_graph;
   size_t num;
+  int KG;
+  int dim;
 
   KNNGraph(const float *data, uint32_t *graph,
-                      uint32_t *new_graph, size_t num)
-       : data(data), graph(graph), new_graph(new_graph), num(num) {}
-};  
+           uint32_t *new_graph, size_t num, int KG, int dim)
+       : data(data), graph(graph), new_graph(new_graph),
+         num(num), KG(KG), dim(dim) {}
+};
 
 __DEVICE__ void Print(KNNGraph *knn_graph) {
   if (threadIdx.x == 0 && blockIdx.x == 0) {
     for (int i = 0; i < knn_graph->num; i++) {
-      for (int j = 0; j < K; j++) {
-        printf("%u ", knn_graph->graph[i * K + j]);
+      for (int j = 0; j < knn_graph->KG; j++) {
+        printf("%u ", knn_graph->graph[i * knn_graph->KG + j]);
       }
       printf("\n");
     }
@@ -52,8 +55,8 @@ __global__ void InitGraph(KNNGraph *knn_graph) {
 
   // std::mt19937 gen(rd());
   // std::uniform_int_distribution<> distrib(0, knn_graph->num - 1);
-  
-  for (int i = 0; i < K; i++) {
+
+  for (int i = 0; i < knn_graph->KG; i++) {
     int n;
     bool is_duplicate;
     do {
@@ -64,7 +67,7 @@ __global__ void InitGraph(KNNGraph *knn_graph) {
         is_duplicate = true;
       } else {
         for (int j = 0; j < i; j++) {
-          if (knn_graph->graph[tid * K + j] == n) {
+          if (knn_graph->graph[tid * knn_graph->KG + j] == n) {
             is_duplicate = true;
             break;
           }
@@ -72,18 +75,18 @@ __global__ void InitGraph(KNNGraph *knn_graph) {
       }
     } while (is_duplicate);
 
-    knn_graph->graph[tid * K + i] = n;
+    knn_graph->graph[tid * knn_graph->KG + i] = n;
   }
 }
 
 __global__ void SwapGraph(KNNGraph *knn_graph) {
   uint32_t id = blockIdx.x;
   uint32_t n = threadIdx.x;
-  if (id >= knn_graph->num || n >= K) {
+  if (id >= knn_graph->num || n >= knn_graph->KG) {
     return;
   }
 
-  knn_graph->graph[id * K + n] = knn_graph->new_graph[id * K + n];
+  knn_graph->graph[id * knn_graph->KG + n] = knn_graph->new_graph[id * knn_graph->KG + n];
 }
 
 // Refine one node per block
@@ -93,16 +96,18 @@ __DEVICE__ void Refine(KNNGraph *knn_graph) {
     return;
   }
 
-  PriorityQueue queue;
-  L2Distance distance(knn_graph->data, knn_graph->data + id * DIM);
+  PriorityQueue queue(knn_graph->KG);
+  L2Distance distance(knn_graph->data,
+                      knn_graph->data + id * knn_graph->dim,
+                      knn_graph->dim);
 
-  for (int i = 0; i < K; i++) {
-    uint32_t n = knn_graph->graph[id * K + i];  // neighbor
+  for (int i = 0; i < knn_graph->KG; i++) {
+    uint32_t n = knn_graph->graph[id * knn_graph->KG + i];  // neighbor
     float dist = distance.Compare(n);
     queue.Add(n, dist);
 
-    for (int j = 0; j < K; j++) {
-      uint32_t nn = knn_graph->graph[n * K + j];  // neighbor's neighbor
+    for (int j = 0; j < knn_graph->KG; j++) {
+      uint32_t nn = knn_graph->graph[n * knn_graph->KG + j];  // neighbor's neighbor
       if (nn != id) {
         dist = distance.Compare(nn);
         queue.Add(nn, dist);
@@ -113,12 +118,12 @@ __DEVICE__ void Refine(KNNGraph *knn_graph) {
 
   __syncthreads();
   uint32_t k = threadIdx.x;
-  if (k >= K) {
+  if (k >= knn_graph->KG) {
     return;
   }
 
   uint32_t n = queue.ids[k];
-  knn_graph->new_graph[id * K + k] = n;
+  knn_graph->new_graph[id * knn_graph->KG + k] = n;
 }
 
 __global__ void RefineGraph(KNNGraph *knn_graph, int iter) {

@@ -14,14 +14,15 @@ namespace knng {
 struct PriorityQueue {
   uint32_t *ids;
   float *dists;
+  int KG;
 
-  __DEVICE__ PriorityQueue() {
-    __shared__ float shared_dists[K];
-    __shared__ uint32_t shared_ids[K];
+  __DEVICE__ PriorityQueue(int KG) : KG(KG) {
+    __shared__ float shared_dists[MAX_KG];
+    __shared__ uint32_t shared_ids[MAX_KG];
     dists = reinterpret_cast<float *>(shared_dists);
     ids = reinterpret_cast<uint32_t *>(shared_ids);
 
-    if (threadIdx.x < K) {
+    if (threadIdx.x < KG) {
       dists[threadIdx.x] = std::numeric_limits<float>::infinity();
       ids[threadIdx.x] = std::numeric_limits<uint32_t>::max();
     }
@@ -33,7 +34,7 @@ struct PriorityQueue {
 
     int tid = threadIdx.x;
 
-    if (tid >= K) {
+    if (tid >= KG) {
       return;
     } else if (tid == 0) {
       exists = false;
@@ -52,7 +53,7 @@ struct PriorityQueue {
     }
 
     if (entry_dist > dist) {
-      if (tid < K - 1) {
+      if (tid < KG - 1) {
         ids[tid + 1] = entry_id;
         dists[tid + 1] = entry_dist;
       }
@@ -72,7 +73,7 @@ struct PriorityQueue {
     __syncthreads();
     if (threadIdx.x == 0) {
       printf("Priority queue: \n");
-      for (int i = 0; i < K; i++) {
+      for (int i = 0; i < KG; i++) {
         printf("%d -> (%d, %lf)\n", i, ids[i], dists[i]);
       }
     }

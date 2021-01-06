@@ -1,5 +1,5 @@
-#ifndef ANNS_DATASET_GIST_HPP_
-#define ANNS_DATASET_GIST_HPP_
+#ifndef ANNS_GIST_HPP_
+#define ANNS_GIST_HPP_
 
 #include "dataset.hpp"
 

@@ -1,5 +1,5 @@
-#ifndef ANNS_DATASET_DATASET_HPP_
-#define ANNS_DATASET_DATASET_HPP_
+#ifndef ANNS_DATASET_HPP_
+#define ANNS_DATASET_HPP_
 
 #include <fstream>
 #include <iostream>
