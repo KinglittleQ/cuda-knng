@@ -9,7 +9,7 @@
 
 
 __global__ void TestPriorityQueue() {
-  PriorityQueue queue;
+  knng::PriorityQueue queue;
   for (int i = 0; i < 100; i++) {
     queue.Add(i, 100.0f - i);
     queue.Add(i, 100.0f - i);

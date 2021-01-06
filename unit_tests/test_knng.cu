@@ -15,7 +15,7 @@ int main(void) {
   data[DIM * 6] = 1.0f;
   data[DIM * 12] = 1.0f;
 
-  NNDescent index(data, num);
+  knng::NNDescent index(data, num);
   index.Build(10);
 
   delete[] data;

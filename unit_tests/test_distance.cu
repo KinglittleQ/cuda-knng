@@ -9,7 +9,7 @@
 
 
 __global__ void ComputeDistance(float *data, uint32_t a, uint32_t b, float *result) {
-  L2Distance distance(data, data + a * DIM);
+  knng::L2Distance distance(data, data + a * DIM);
   float ret = distance.Compare(b);
   if (threadIdx.x == 0) {
     *result = ret;

@@ -15,6 +15,7 @@
 #include <knng/priority_queue.cuh>
 #include <knng/utils.cuh>
 
+namespace knng {
 
 struct KNNGraph {
   const float *data;
@@ -128,7 +129,6 @@ __global__ void RefineGraph(KNNGraph *knn_graph, int iter) {
   Refine(knn_graph);
 }
 
-// };
-
+}  // end knng
 
 #endif

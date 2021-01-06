@@ -9,6 +9,7 @@
 
 #include <knng/config.cuh>
 
+namespace knng {
 
 struct PriorityQueue {
   uint32_t *ids;
@@ -79,5 +80,6 @@ struct PriorityQueue {
 
 };
 
+}  // end knng
 
 #endif

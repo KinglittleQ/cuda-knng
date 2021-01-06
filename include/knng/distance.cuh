@@ -9,6 +9,7 @@
 
 #include <knng/config.cuh>
 
+namespace knng {
 
 struct L2Distance {
   static constexpr int ITEMS_PER_THREAD = (DIM - 1) / BLOCK_DIM_X + 1;
@@ -46,7 +47,6 @@ struct L2Distance {
     }
 
     float sum = BlockReduce(*storage).Sum(result);
-
     if (threadIdx.x == 0) {
       shared_sum = sum;
     }
@@ -56,5 +56,7 @@ struct L2Distance {
   }
 
 };
+
+}  // end knng
 
 #endif
