@@ -17,7 +17,7 @@ struct L2Distance {
   using TempStorage = typename BlockReduce::TempStorage;
 
   const float *data;
-  const float *query;
+  float *query;
   TempStorage *storage;
   int dim;
 
@@ -25,8 +25,10 @@ struct L2Distance {
                         const float *global_query, int dim)
          : data(global_data), dim(dim) {
     // copy from global memory to block memory
-    // memcpy(query, global_query, sizeof(float) * DIM);
-    query = global_query;
+    __shared__ float shared_query[BLOCK_DIM_X];
+    query = reinterpret_cast<float *>(shared_query);
+    memcpy(query, global_query, sizeof(float) * dim);
+    // query = global_query;
 
     // allocate shared memory
     __shared__ TempStorage shared_storage;
