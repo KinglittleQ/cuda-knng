@@ -16,6 +16,8 @@ set(CUDA_NVCC_FLAGS "${CUDA_NVCC_FLAGS} -std=c++14 -Xptxas=-v --expt-relaxed-con
 message("CUDA_ARCH_LIST: ${CUDA_ARCH_LIST}")
 message("CUDA_NVCC_FLAGS: ${CUDA_NVCC_FLAGS}")
 
+set(DATASET_INCLUDE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/datasets)
+
 cuda_add_executable(test_distance unit_tests/test_distance.cu)
 target_include_directories(test_distance
                            PRIVATE
@@ -36,5 +38,6 @@ target_include_directories(test_knng
                            PRIVATE
                            ${CUDA_NVCC_FLAGS}
                            ${CUB_INCLUDE_PATH}
+                           ${DATASET_INCLUDE_PATH}
                            ${CMAKE_CURRENT_SOURCE_DIR}/include)
 target_link_libraries(test_knng ${CUDA_curand_LIBRARY})

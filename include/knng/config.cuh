@@ -7,7 +7,7 @@
 
 constexpr int BLOCK_DIM_X = 128;
 constexpr int DIM = 128;
-constexpr int K = 32;
+constexpr int K = 128;
 
 using ValueT = float;
 using KeyT = uint32_t;

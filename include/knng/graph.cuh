@@ -59,7 +59,7 @@ __global__ void InitGraph(KNNGraph *knn_graph) {
     do {
       is_duplicate = false;
       // n = distrib(gen);
-      n = (tid + i + 1) % knn_graph->num;
+      n = (tid + 1000 * i + 1) % knn_graph->num;
       if (n == tid) {
         is_duplicate = true;
       } else {
