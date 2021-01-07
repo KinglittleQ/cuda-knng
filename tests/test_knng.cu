@@ -47,7 +47,7 @@ int main(int argc, char **argv) {
     exit(0);
   }
 
-  knng::NNDescent index(base_data, nb, KG, d);
+  knng::NNDescent index(base_data, nb);
   index.Build(iters);
 
   std::vector<std::vector<unsigned>> result;

@@ -12,11 +12,10 @@ namespace knng {
 struct PriorityQueue {
   uint32_t *ids;
   float *dists;
-  int KG;
 
-  __DEVICE__ PriorityQueue(int KG) : KG(KG) {
-    __shared__ float shared_dists[MAX_KG];
-    __shared__ uint32_t shared_ids[MAX_KG];
+  __DEVICE__ PriorityQueue() {
+    __shared__ float shared_dists[KG];
+    __shared__ uint32_t shared_ids[KG];
     dists = reinterpret_cast<float *>(shared_dists);
     ids = reinterpret_cast<uint32_t *>(shared_ids);
 

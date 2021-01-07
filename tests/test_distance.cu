@@ -5,8 +5,8 @@
 #include <knng/distance.cuh>
 #include <knng/utils.cuh>
 
-__global__ void ComputeDistance(float *data, uint32_t a, uint32_t b, int dim, float *result) {
-  knng::L2Distance distance(data, data + a * dim, dim);
+__global__ void ComputeDistance(float *data, uint32_t a, uint32_t b, float *result) {
+  knng::L2Distance distance(data, data + a * DIM);
   float ret = distance.Compare(b);
   if (threadIdx.x == 0) {
     *result = ret;
@@ -14,7 +14,6 @@ __global__ void ComputeDistance(float *data, uint32_t a, uint32_t b, int dim, fl
 }
 
 int main(void) {
-  const int DIM = 128;
   float data[2 * DIM];
   float result;
   float *cuda_data, *cuda_result;
@@ -28,7 +27,7 @@ int main(void) {
   cudaMemcpy(cuda_data, data, 2 * DIM * sizeof(float), cudaMemcpyHostToDevice);
   cudaMalloc(&cuda_result, sizeof(float));
 
-  ComputeDistance<<<1, BLOCK_DIM_X>>>(cuda_data, 0, 1, DIM, cuda_result);
+  ComputeDistance<<<1, BLOCK_DIM_X>>>(cuda_data, 0, 1, cuda_result);
   CheckCudaStatus();
 
   cudaMemcpy(&result, cuda_result, sizeof(float), cudaMemcpyDeviceToHost);

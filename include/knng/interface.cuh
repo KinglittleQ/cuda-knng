@@ -18,7 +18,7 @@
 
 namespace knng {
 
-void Print(uint32_t *graph, int KG) {
+void Print(uint32_t *graph) {
   for (int i = 0; i < 10; i++) {
     for (int j = 0; j < KG; j++) {
       printf("%u ", graph[i * KG + j]);
@@ -89,8 +89,6 @@ inline unsigned InsertIntoPool(Neighbor *addr, unsigned M, Neighbor nn) {
 struct NNDescent {
   const float *data;
   size_t num;
-  int KG;
-  int dim;
   uint32_t *graph;
   KNNGraph *knn_graph;
 
@@ -98,15 +96,15 @@ struct NNDescent {
   uint32_t *cuda_graph, *cuda_new_graph;
   anns::L2Distance distance;
 
-  NNDescent(const float *data, size_t num, int KG, int dim)
-      : data(data), num(num), KG(KG), dim(dim), distance(dim) {
+  NNDescent(const float *data, size_t num)
+      : data(data), num(num), distance(DIM) {
     graph = new uint32_t[KG * num];
-    cudaMalloc(&cuda_data, num * dim * sizeof(float));
-    cudaMemcpy(cuda_data, data, num * dim * sizeof(float), cudaMemcpyHostToDevice);
+    cudaMalloc(&cuda_data, num * DIM * sizeof(float));
+    cudaMemcpy(cuda_data, data, num * DIM * sizeof(float), cudaMemcpyHostToDevice);
     cudaMalloc(&cuda_graph, KG * num * sizeof(uint32_t));
     cudaMalloc(&cuda_new_graph, KG * num * sizeof(uint32_t));
 
-    KNNGraph tmp(cuda_data, cuda_graph, cuda_new_graph, num, KG, dim);
+    KNNGraph tmp(cuda_data, cuda_graph, cuda_new_graph, num);
     cudaMalloc(&knn_graph, sizeof(KNNGraph));
     cudaMemcpy(knn_graph, &tmp, sizeof(KNNGraph), cudaMemcpyHostToDevice);
   }
@@ -131,7 +129,7 @@ struct NNDescent {
       CheckCudaStatus();
     }
     cudaMemcpy(graph, cuda_graph, num * KG * sizeof(uint32_t), cudaMemcpyDeviceToHost);
-    // Print(graph, KG);
+    // Print(graph);
   }
 
   void Search(const float *query, unsigned topk, unsigned L, unsigned *indices) {
@@ -145,7 +143,7 @@ struct NNDescent {
 
     for (unsigned i = 0; i < L; i++) {
       unsigned id = init_ids[i];
-      float dist = distance.Compare(data + dim * id, query);
+      float dist = distance.Compare(data + DIM * id, query);
       retset[i] = Neighbor(id, dist, true);
     }
 
@@ -162,7 +160,7 @@ struct NNDescent {
           unsigned id = graph[n * KG + m];
           if (flags.test(id)) continue;
           flags.set(id);
-          float dist = distance.Compare(query, data + dim * id);
+          float dist = distance.Compare(query, data + DIM * id);
           if (dist >= retset[L - 1].distance) continue;
           Neighbor nn(id, dist, true);
           int r = InsertIntoPool(retset.data(), L, nn);

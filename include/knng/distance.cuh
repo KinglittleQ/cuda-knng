@@ -16,14 +16,13 @@ struct L2Distance {
   const float *data;
   float *query;
   TempStorage *storage;
-  int dim;
 
-  __DEVICE__ L2Distance(const float *global_data, const float *global_query, int dim)
-      : data(global_data), dim(dim) {
+  __DEVICE__ L2Distance(const float *global_data, const float *global_query)
+      : data(global_data) {
     // copy from global memory to block memory
     __shared__ float shared_query[BLOCK_DIM_X];
     query = reinterpret_cast<float *>(shared_query);
-    memcpy(query, global_query, sizeof(float) * dim);
+    memcpy(query, global_query, sizeof(float) * DIM);
     // query = global_query;
 
     // allocate shared memory
@@ -36,8 +35,8 @@ struct L2Distance {
 
     float result = 0;
     int tid = threadIdx.x;
-    if (tid < dim) {
-      float diff = query[tid] - data[p * dim + tid];
+    if (tid < DIM) {
+      float diff = query[tid] - data[p * DIM + tid];
       result += diff * diff;
     }
 

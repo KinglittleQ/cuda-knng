@@ -6,7 +6,7 @@
 #include <knng/utils.cuh>
 
 __global__ void TestPriorityQueue() {
-  knng::PriorityQueue queue(32);
+  knng::PriorityQueue queue;
   for (int i = 0; i < 100; i++) {
     queue.Add(i, 100.0f - i);
     queue.Add(i, 100.0f - i);
