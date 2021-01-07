@@ -12,5 +12,4 @@ constexpr int MAX_KG = BLOCK_DIM_X;
 using ValueT = float;
 using KeyT = uint32_t;
 
-
 #endif

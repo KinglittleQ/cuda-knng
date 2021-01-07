@@ -2,17 +2,14 @@
 #define KNNG_DISTANCE_CUH_
 
 #include <cstring>
-
+#include <cub/cub.cuh>
 #include <cuda.h>
 #include <cuda_runtime.h>
-#include <cub/cub.cuh>
-
 #include <knng/config.cuh>
 
 namespace knng {
 
 struct L2Distance {
-
   using BlockReduce = cub::BlockReduce<ValueT, BLOCK_DIM_X>;
   using TempStorage = typename BlockReduce::TempStorage;
 
@@ -21,9 +18,8 @@ struct L2Distance {
   TempStorage *storage;
   int dim;
 
-  __DEVICE__ L2Distance(const float *global_data,
-                        const float *global_query, int dim)
-         : data(global_data), dim(dim) {
+  __DEVICE__ L2Distance(const float *global_data, const float *global_query, int dim)
+      : data(global_data), dim(dim) {
     // copy from global memory to block memory
     __shared__ float shared_query[BLOCK_DIM_X];
     query = reinterpret_cast<float *>(shared_query);
@@ -34,7 +30,7 @@ struct L2Distance {
     __shared__ TempStorage shared_storage;
     storage = &shared_storage;
   }
-  
+
   __DEVICE__ float Compare(const uint32_t p) {
     __shared__ float shared_sum;
 
@@ -53,9 +49,8 @@ struct L2Distance {
 
     return shared_sum;
   }
-
 };
 
-}  // end knng
+}  // namespace knng
 
 #endif

@@ -1,12 +1,9 @@
-#include <iostream>
-
 #include <cuda.h>
 #include <cuda_runtime.h>
-
+#include <iostream>
 #include <knng/config.cuh>
-#include <knng/utils.cuh>
 #include <knng/priority_queue.cuh>
-
+#include <knng/utils.cuh>
 
 __global__ void TestPriorityQueue() {
   knng::PriorityQueue queue(32);

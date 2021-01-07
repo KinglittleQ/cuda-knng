@@ -1,22 +1,17 @@
-#include <iostream>
-
 #include <cuda.h>
 #include <cuda_runtime.h>
-
+#include <iostream>
 #include <knng/config.cuh>
-#include <knng/utils.cuh>
 #include <knng/distance.cuh>
+#include <knng/utils.cuh>
 
-
-__global__ void ComputeDistance(float *data, uint32_t a, uint32_t b,
-                                int dim, float *result) {
+__global__ void ComputeDistance(float *data, uint32_t a, uint32_t b, int dim, float *result) {
   knng::L2Distance distance(data, data + a * dim, dim);
   float ret = distance.Compare(b);
   if (threadIdx.x == 0) {
     *result = ret;
   }
 }
-
 
 int main(void) {
   const int DIM = 128;
@@ -36,7 +31,7 @@ int main(void) {
   ComputeDistance<<<1, BLOCK_DIM_X>>>(cuda_data, 0, 1, DIM, cuda_result);
   CheckCudaStatus();
 
-  cudaMemcpy(&result, cuda_result,sizeof(float), cudaMemcpyDeviceToHost);
+  cudaMemcpy(&result, cuda_result, sizeof(float), cudaMemcpyDeviceToHost);
   std::cout << result << std::endl;
 
   cudaFree(cuda_data);

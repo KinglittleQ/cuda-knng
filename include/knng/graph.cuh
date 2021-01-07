@@ -2,18 +2,16 @@
 #define KNNG_GRAPH_CUH_
 
 #include <cstring>
-#include <limits>
-#include <random>
-
 #include <cuda.h>
 #include <cuda_runtime.h>
 #include <curand.h>
 #include <curand_kernel.h>
-
 #include <knng/config.cuh>
 #include <knng/distance.cuh>
 #include <knng/priority_queue.cuh>
 #include <knng/utils.cuh>
+#include <limits>
+#include <random>
 
 namespace knng {
 
@@ -25,10 +23,8 @@ struct KNNGraph {
   int KG;
   int dim;
 
-  KNNGraph(const float *data, uint32_t *graph,
-           uint32_t *new_graph, size_t num, int KG, int dim)
-       : data(data), graph(graph), new_graph(new_graph),
-         num(num), KG(KG), dim(dim) {}
+  KNNGraph(const float *data, uint32_t *graph, uint32_t *new_graph, size_t num, int KG, int dim)
+      : data(data), graph(graph), new_graph(new_graph), num(num), KG(KG), dim(dim) {}
 };
 
 __DEVICE__ void Print(KNNGraph *knn_graph) {
@@ -97,9 +93,7 @@ __DEVICE__ void Refine(KNNGraph *knn_graph) {
   }
 
   PriorityQueue queue(knn_graph->KG);
-  L2Distance distance(knn_graph->data,
-                      knn_graph->data + id * knn_graph->dim,
-                      knn_graph->dim);
+  L2Distance distance(knn_graph->data, knn_graph->data + id * knn_graph->dim, knn_graph->dim);
 
   for (int i = 0; i < knn_graph->KG; i++) {
     uint32_t n = knn_graph->graph[id * knn_graph->KG + i];  // neighbor
@@ -134,6 +128,6 @@ __global__ void RefineGraph(KNNGraph *knn_graph, int iter) {
   Refine(knn_graph);
 }
 
-}  // end knng
+}  // namespace knng
 
 #endif

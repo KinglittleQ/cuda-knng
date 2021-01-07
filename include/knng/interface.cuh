@@ -1,25 +1,20 @@
-#ifndef KNNG_INTERFACE_HH_
-#define KNNG_INTERFACE_HH_
+#ifndef KNNG_INTERFACE_CUH_
+#define KNNG_INTERFACE_CUH_
 
 #include <algorithm>
+#include <anns/distance.hpp>
+#include <boost/dynamic_bitset.hpp>
 #include <cstring>
+#include <cuda.h>
+#include <cuda_runtime.h>
 #include <iostream>
+#include <knng/config.cuh>
+#include <knng/graph.cuh>
+#include <knng/utils.cuh>
 #include <limits>
 #include <memory>
 #include <random>
 #include <vector>
-
-#include <boost/dynamic_bitset.hpp>
-
-#include <cuda.h>
-#include <cuda_runtime.h>
-
-#include <knng/config.cuh>
-#include <knng/utils.cuh>
-#include <knng/graph.cuh>
-
-#include <anns/distance.hpp>
-
 
 namespace knng {
 
@@ -43,7 +38,7 @@ struct Neighbor {
   inline bool operator<(const Neighbor &other) const { return distance < other.distance; }
 };
 
-void GenRandom(std::mt19937& rng, unsigned* addr, unsigned size, unsigned N) {
+void GenRandom(std::mt19937 &rng, unsigned *addr, unsigned size, unsigned N) {
   for (unsigned i = 0; i < size; ++i) {
     addr[i] = rng() % (N - size);
   }
@@ -59,12 +54,11 @@ void GenRandom(std::mt19937& rng, unsigned* addr, unsigned size, unsigned N) {
   }
 }
 
-inline unsigned InsertIntoPool(Neighbor *addr, unsigned M,
-                                Neighbor nn) {
+inline unsigned InsertIntoPool(Neighbor *addr, unsigned M, Neighbor nn) {
   // find the location to insert
   unsigned left = 0, right = M - 1;
   if (addr[left].distance > nn.distance) {
-    memmove((char *) &addr[left + 1], &addr[left], M * sizeof(Neighbor));
+    memmove((char *)&addr[left + 1], &addr[left], M * sizeof(Neighbor));
     addr[left] = nn;
     return left;
   }
@@ -82,16 +76,12 @@ inline unsigned InsertIntoPool(Neighbor *addr, unsigned M,
   // checM equal ID
 
   while (left > 0) {
-    if (addr[left].distance < nn.distance)
-      break;
-    if (addr[left].id == nn.id)
-      return M + 1;
+    if (addr[left].distance < nn.distance) break;
+    if (addr[left].id == nn.id) return M + 1;
     left--;
   }
-  if (addr[left].id == nn.id || addr[right].id == nn.id)
-    return M + 1;
-  memmove((char *) &addr[right + 1], &addr[right],
-          (M - right) * sizeof(Neighbor));
+  if (addr[left].id == nn.id || addr[right].id == nn.id) return M + 1;
+  memmove((char *)&addr[right + 1], &addr[right], (M - right) * sizeof(Neighbor));
   addr[right] = nn;
   return right;
 }
@@ -109,8 +99,7 @@ struct NNDescent {
   anns::L2Distance distance;
 
   NNDescent(const float *data, size_t num, int KG, int dim)
-     : data(data), num(num), KG(KG), dim(dim), distance(dim) {
-
+      : data(data), num(num), KG(KG), dim(dim), distance(dim) {
     graph = new uint32_t[KG * num];
     cudaMalloc(&cuda_data, num * dim * sizeof(float));
     cudaMemcpy(cuda_data, data, num * dim * sizeof(float), cudaMemcpyHostToDevice);
@@ -145,10 +134,7 @@ struct NNDescent {
     // Print(graph, KG);
   }
 
-  void Search(const float *query,
-              unsigned topk,
-              unsigned L,
-              unsigned *indices) {
+  void Search(const float *query, unsigned topk, unsigned L, unsigned *indices) {
     std::vector<Neighbor> retset(L + 1);
     std::vector<unsigned> init_ids(L);
     std::mt19937 rng(rand());
@@ -197,6 +183,6 @@ struct NNDescent {
   }
 };
 
-}  // end knng
+}  // namespace knng
 
 #endif

@@ -1,9 +1,7 @@
-#include <iostream>
-#include <set>
-
-#include <knng/interface.cuh>
 #include <anns/sift.hpp>
-
+#include <iostream>
+#include <knng/interface.cuh>
+#include <set>
 
 double ComputeRecall(uint32_t num,
                      int K,
@@ -25,7 +23,6 @@ double ComputeRecall(uint32_t num,
   return 1.0 * recalls / (num * K);
 }
 
-
 int main(int argc, char **argv) {
   float *base_data, *query_data;
   int *gt_data;
@@ -35,7 +32,7 @@ int main(int argc, char **argv) {
     std::cout << "Usage: $0 data_dir KG L iters" << std::endl;
     exit(0);
   }
-  
+
   anns::SIFTDataset dataset(argv[1]);
   int KG = atoi(argv[2]);
   unsigned L = atoi(argv[3]);
@@ -46,14 +43,13 @@ int main(int argc, char **argv) {
 
   if (KG > BLOCK_DIM_X || d > BLOCK_DIM_X) {
     std::cout << "KG/d must be samller or equal than BLOCK_DIM_X"
-              << " (" << BLOCK_DIM_X << ")"
-              << std::endl;
+              << " (" << BLOCK_DIM_X << ")" << std::endl;
     exit(0);
   }
-  
+
   knng::NNDescent index(base_data, nb, KG, d);
   index.Build(iters);
-  
+
   std::vector<std::vector<unsigned>> result;
   result.resize(nq);
   for (size_t i = 0; i < nq; i++) {

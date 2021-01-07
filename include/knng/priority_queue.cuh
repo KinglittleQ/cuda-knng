@@ -2,12 +2,10 @@
 #define KNNG_PRIORITY_QUEUE_CUH_
 
 #include <cstring>
-#include <limits>
-
 #include <cuda.h>
 #include <cuda_runtime.h>
-
 #include <knng/config.cuh>
+#include <limits>
 
 namespace knng {
 
@@ -65,9 +63,7 @@ struct PriorityQueue {
     }
   }
 
-  __DEVICE__ uint32_t Top() {
-    return ids[0];
-  }
+  __DEVICE__ uint32_t Top() { return ids[0]; }
 
   __DEVICE__ void Print() {
     __syncthreads();
@@ -78,9 +74,8 @@ struct PriorityQueue {
       }
     }
   }
-
 };
 
-}  // end knng
+}  // namespace knng
 
 #endif
