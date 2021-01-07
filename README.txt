@@ -11,7 +11,7 @@ b. Repeat n times:
 
 2. Setup
 
-$ git clone --recursive https://github.com/KinglittleQ/knng.git
+$ git clone --recursive https://github.com/KinglittleQ/cuda-knng.git
 $ mkdir build && cd build
 $ cmake ..
 $ make -j
