@@ -1,26 +1,29 @@
 ---
 Language: Cpp
 BasedOnStyle: Google
-AllowAllParametersOfDeclarationOnNextLine: false
-AlwaysBreakTemplateDeclarations: true
-BinPackArguments: false
-BinPackParameters: false
-BreakConstructorInitializers: BeforeComma
+
 ColumnLimit: 100
-CommentPragmas: '^(!|NOLINT)'
-ConstructorInitializerAllOnOneLineOrOnePerLine: true
+
+SortIncludes: true
 IncludeBlocks: Regroup
-IncludeCategories: 
+IncludeCategories:
+  - Regex: 'knng/*'
+    Priority: 7
+  - Regex: 'anns/*'
+    Priority: 6
+  - Regex: 'cub/*'
+    Priority: 5
+  - Regex: 'cuda*'
+    Priority: 4
+  - Regex: 'boost/*'
+    Priority: 3
   - Regex: '^<.*'
     Priority: 2
   - Regex: '.*'
     Priority: 1
-IncludeIsMainRegex: '(_dt|_win)?$'
+
 IndentCaseLabels: true
 IndentWidth: 2
-KeepEmptyLinesAtTheStartOfBlocks: false
-PenaltyReturnTypeOnItsOwnLine: 200
 SpacesBeforeTrailingComments: 2
 TabWidth: 2
 UseTab: Never
-...

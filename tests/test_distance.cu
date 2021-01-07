@@ -1,6 +1,8 @@
+#include <iostream>
+
 #include <cuda.h>
 #include <cuda_runtime.h>
-#include <iostream>
+
 #include <knng/config.cuh>
 #include <knng/distance.cuh>
 #include <knng/utils.cuh>

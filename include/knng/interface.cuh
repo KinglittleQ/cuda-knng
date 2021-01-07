@@ -2,19 +2,23 @@
 #define KNNG_INTERFACE_CUH_
 
 #include <algorithm>
-#include <anns/distance.hpp>
-#include <boost/dynamic_bitset.hpp>
 #include <cstring>
-#include <cuda.h>
-#include <cuda_runtime.h>
 #include <iostream>
-#include <knng/config.cuh>
-#include <knng/graph.cuh>
-#include <knng/utils.cuh>
 #include <limits>
 #include <memory>
 #include <random>
 #include <vector>
+
+#include <boost/dynamic_bitset.hpp>
+
+#include <cuda.h>
+#include <cuda_runtime.h>
+
+#include <anns/distance.hpp>
+
+#include <knng/config.cuh>
+#include <knng/graph.cuh>
+#include <knng/utils.cuh>
 
 namespace knng {
 

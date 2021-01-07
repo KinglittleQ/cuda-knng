@@ -2,9 +2,12 @@
 #define KNNG_DISTANCE_CUH_
 
 #include <cstring>
-#include <cub/cub.cuh>
+
 #include <cuda.h>
 #include <cuda_runtime.h>
+
+#include <cub/cub.cuh>
+
 #include <knng/config.cuh>
 
 namespace knng {

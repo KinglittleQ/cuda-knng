@@ -2,10 +2,12 @@
 #define KNNG_PRIORITY_QUEUE_CUH_
 
 #include <cstring>
+#include <limits>
+
 #include <cuda.h>
 #include <cuda_runtime.h>
+
 #include <knng/config.cuh>
-#include <limits>
 
 namespace knng {
 

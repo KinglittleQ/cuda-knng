@@ -2,16 +2,18 @@
 #define KNNG_GRAPH_CUH_
 
 #include <cstring>
-#include <cuda.h>
-#include <cuda_runtime.h>
 #include <curand.h>
 #include <curand_kernel.h>
+#include <limits>
+#include <random>
+
+#include <cuda.h>
+#include <cuda_runtime.h>
+
 #include <knng/config.cuh>
 #include <knng/distance.cuh>
 #include <knng/priority_queue.cuh>
 #include <knng/utils.cuh>
-#include <limits>
-#include <random>
 
 namespace knng {
 
