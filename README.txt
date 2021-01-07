@@ -1,4 +1,4 @@
-Build a KNN graph on GPU.
+A toy for building a KNN graph on GPU.
 
 1. Algorithm:
 
@@ -33,8 +33,8 @@ iters: number of iterations
 
 Time for building a KNN graph on SIFT1M with K = 128 (running on GPU): 861 s
 Searching on the graph we built above with L = 200 (running on CPU with one thread):
-    - Speed: 4.233 ms/query
-    - Recall@100: 0.987
+  - Speed: 4.233 ms/query
+  - Recall@100: 0.987
 
 6. Core code
 
